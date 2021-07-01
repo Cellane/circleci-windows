@@ -1,19 +1,31 @@
 version: 2.1
 
 orbs:
-  win: circleci/windows@2.2.0
+  win: circleci/windows@2.4.0
 
 jobs:
   build:
     executor:
       name: win/default
-      shell: powershell.exe
+    working_directory: C:\Users\circleci\project\HelloWorld
     steps:
-      - checkout
-      - run: systeminfo
+      - checkout:
+          path: C:\Users\circleci\project
+      - restore_cache:
+          keys:
+            - dotnet-packages-v1-{{ checksum "circleci-demo-windows.csproj" }}
       - run:
-          name: "Check Docker"
-          shell: powershell.exe
-          command: |
-            docker info
-            docker run hello-world:nanoserver-1809
+          name: Install project dependencies
+          command: dotnet.exe restore
+      - save_cache:
+          paths:
+            - C:\Users\circleci\project\HelloWorld\.nuget\packages
+          key: dotnet-packages-v1-{{ checksum "circleci-demo-windows.csproj" }}
+      - run:
+          name: Run Build step
+          command: dotnet.exe publish -c Release -r win10-x64
+      - run:
+          name: Test the executable
+          command: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe
+      - store_artifacts:
+          path: .\bin\Release\netcoreapp2.1\win10-x64\publish\circleci-demo-windows.exe

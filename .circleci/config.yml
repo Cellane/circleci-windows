@@ -7,7 +7,7 @@ jobs:
   build:
     executor:
       name: win/default
-    working_directory: C:\Users\circleci\project\HelloWorld\HelloWorld
+    working_directory: C:\Users\circleci\project\HelloWorld
     steps:
       - checkout:
           path: C:\Users\circleci\project
